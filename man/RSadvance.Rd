@@ -7,7 +7,7 @@
    different studies, e.g. data sets generated at different 
    laboratories.}
 
-\Usage{
+\usage{
     RSadvance(data,cl,origin,num.perm=100,logged=TRUE,
                  na.rm=FALSE,gene.names=NULL,plot=FALSE, rand=NULL)
 }
