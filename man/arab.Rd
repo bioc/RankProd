@@ -12,7 +12,11 @@
        random selected 500 genes and 10 samples, 6 from lab 1 and 4 from 
        lab 2. Data was pre-processed by RMA 
 }
-\usage{data{arab}}
+
+\usage{
+data{arab}
+}
+
 \format{ 
    \item{arab}{matrix of gene expression levels of 500 genes 
                from 10 samples, rows correspond to genes  and 
