@@ -1,6 +1,12 @@
 "RP" <-
 function(data,cl,num.perm = 100,logged = TRUE,na.rm = FALSE,gene.names = NULL,plot = FALSE, rand = NULL)
 {
+
+  if (is.vector(data)) {
+    cat("Warning: There is only one gene in the data set","\n","\n")
+    data=matrix(data,nrow=1)  ##force into matrix format
+   } 
+
   total.sam <- length(cl)
   total.sam2 <- dim(data)[2]
   if ( total.sam != total.sam2)
