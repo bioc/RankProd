@@ -1,5 +1,5 @@
 "RSadvance" <-
-function(data,cl,origin,num.perm=100,rev.sorting=FALSE,logged=TRUE,na.rm=FALSE,gene.names=NULL,plot=FALSE, rand=NULL)
+function(data,cl,origin,num.perm=100,logged=TRUE,na.rm=FALSE,gene.names=NULL,plot=FALSE, rand=NULL)
 {
   ##different from RP, as it use variance as penalty
 
