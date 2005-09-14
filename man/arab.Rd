@@ -1,5 +1,4 @@
 \name{arab}
-\docType{data}
 \alias{arab}
 \alias{arab.cl}
 \alias{arab.origin}
