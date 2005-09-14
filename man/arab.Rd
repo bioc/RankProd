@@ -1,4 +1,5 @@
 \name{arab}
+\docType{data}
 \alias{arab}
 \alias{arab.cl}
 \alias{arab.origin}
@@ -12,7 +13,7 @@
        lab 2. Data was pre-processed by RMA 
 }
 
-\usage{data{arab}}
+\usage{data(arab)}
 
 \value{
    \item{arab}{matrix of gene expression levels of 500 genes 
