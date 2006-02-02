@@ -95,6 +95,7 @@ function(data,cl,num.perm = 100,logged = TRUE,na.rm = FALSE,gene.names = NULL,pl
    order.temp <- match(temp2,sort(temp2))
    count.perm <- (sort(temp2)-c(1:num.gene))[order.temp]
    exp.count <- count.perm/num.perm
+   pval.upin2 <- count.perm/(num.perm*num.gene)
  
    pfp.upin2 <- exp.count/rank.ori.upin2 
    if (plot) 
@@ -112,7 +113,9 @@ function(data,cl,num.perm = 100,logged = TRUE,na.rm = FALSE,gene.names = NULL,pl
    order.temp <- match(temp2,sort(temp2))
    count.perm <- (sort(temp2)-c(1:num.gene))[order.temp]
    exp.count <- count.perm/num.perm
- 
+   pval.downin2 <- count.perm/(num.perm*num.gene)
+  
+
    pfp.downin2 <- exp.count/rank.ori.downin2
    if (plot) 
    { plot(rank.ori.downin2,pfp.downin2,xlab="sorted gene rank of the original rank product",ylab="estimated PFP")
@@ -122,8 +125,15 @@ function(data,cl,num.perm = 100,logged = TRUE,na.rm = FALSE,gene.names = NULL,pl
    rm(temp1,temp2,order.temp,count.perm,exp.count)
 
     ##output the estimated pfp and ranks of all genes
+    cat("Outputing the results ..","\n")
+
+
     pfp=data.frame(pfp.upin2,pfp.downin2)
     colnames(pfp)=c("class1 < class2","class1 > class 2")
+
+    pval=data.frame(pval.upin2,pval.downin2)
+    colnames(pval)=c("class1 < class2","class1 > class 2")
+   
     RPs=data.frame(RP.ori.upin2$RP,RP.ori.downin2$RP)
     colnames(RPs)=c("class1 < class2","class1 > class 2")
     RPrank=data.frame(rank.ori.upin2,rank.ori.downin2)
@@ -135,11 +145,12 @@ function(data,cl,num.perm = 100,logged = TRUE,na.rm = FALSE,gene.names = NULL,pl
 
     if (!is.null(gene.names)) {
            rownames(pfp)=gene.names
+           rownames(pval)=gene.names
            rownames(RPs)=gene.names
            rownames(RPrank)=gene.names
            rownames(fold.change)=gene.names
    } 
 
-    list(pfp=pfp,RPs=RPs,RPrank=RPrank,Orirank=Orirank,AveFC=fold.change)            
+    list(pfp=pfp,pval=pval,RPs=RPs,RPrank=RPrank,Orirank=Orirank,AveFC=fold.change)            
    
  }
