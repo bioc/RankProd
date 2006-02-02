@@ -115,7 +115,8 @@ function(data,cl,origin,num.perm=100,logged=TRUE,na.rm=FALSE,gene.names=NULL,plo
    order.temp=match(temp2,sort(temp2))
    count.perm=(sort(temp2)-c(1:num.gene))[order.temp]
    exp.count=count.perm/num.perm
-
+   pval.upin2 <- count.perm/(num.perm*num.gene)
+ 
    
    pfp.upin2= exp.count/rank.ori.upin2
    if (plot) 
@@ -132,7 +133,9 @@ function(data,cl,origin,num.perm=100,logged=TRUE,na.rm=FALSE,gene.names=NULL,plo
    order.temp <- match(temp2,sort(temp2))
    count.perm <- (sort(temp2)-c(1:num.gene))[order.temp]
    exp.count <- count.perm/num.perm
- 
+   pval.downin2 <- count.perm/(num.perm*num.gene)
+   
+
    pfp.downin2 <- exp.count/rank.ori.downin2
    if (plot) 
    { plot(rank.ori.downin2,pfp.downin2,xlab="sorted gene rank of the original rank product",ylab="estimated PFP")
@@ -145,6 +148,9 @@ function(data,cl,origin,num.perm=100,logged=TRUE,na.rm=FALSE,gene.names=NULL,plo
    pfp=data.frame(pfp.upin2,pfp.downin2)
    colnames(pfp)=c("class1 < class2","class1 > class 2")
 
+   pval=data.frame(pval.upin2,pval.downin2)
+   colnames(pval)=c("class1 < class2","class1 > class 2")
+   
    RSs=data.frame(RS.ori.upin2,RS.ori.downin2)
    colnames(RSs)=c("class1 < class2","class1 > class 2")
 
@@ -159,6 +165,7 @@ function(data,cl,origin,num.perm=100,logged=TRUE,na.rm=FALSE,gene.names=NULL,plo
 
    if (!is.null(gene.names)) {
            rownames(pfp)=gene.names
+           rownames(pval)=gene.names
            rownames(RSs)=gene.names
            rownames(RSrank)=gene.names
            rownames(ave.fold.change)=gene.names
@@ -166,7 +173,7 @@ function(data,cl,origin,num.perm=100,logged=TRUE,na.rm=FALSE,gene.names=NULL,plo
 
 
     
-   list(pfp=pfp,RSs=RSs,RSrank=RSrank,Orirank=Orirank,AveFC=ave.fold.change)
+   list(pfp=pfp,pval=pval,RSs=RSs,RSrank=RSrank,Orirank=Orirank,AveFC=ave.fold.change)
        
     
  }
