@@ -1,9 +1,10 @@
 "topGene" <-
-function(x,cutoff=NULL,num.gene=NULL,logged=TRUE,logbase=2,gene.names=NULL)
+function(x,cutoff=NULL,method="pfp",num.gene=NULL,logged=TRUE,logbase=2,gene.names=NULL)
 {  
    ##input is x: an RP object
    pfp=as.matrix(x$pfp)
    FC=as.matrix(x$AveFC)  ##data1/ data2
+   pval=as.matrix(x$pval)
    
    if (is.null(x$RPs) ){  ##Rank Sum
       RP=as.matrix(x$RSs)
@@ -24,9 +25,20 @@ function(x,cutoff=NULL,num.gene=NULL,logged=TRUE,logbase=2,gene.names=NULL)
    RP.sort.downin2=sort(RP[,2],index.return=TRUE)
 
    if (!is.null(cutoff) ) {
+
+      if (method == "pfp") {
       cutgenes.upin2=which(pfp[RP.sort.upin2$ix,1]<cutoff)
       cutgenes.downin2=which(pfp[RP.sort.downin2$ix,2]<cutoff)
-      
+        } else {
+          if (method == "pval") {
+            cutgenes.upin2=which(pval[RP.sort.upin2$ix,1]<cutoff)
+            cutgenes.downin2=which(pval[RP.sort.downin2$ix,2]<cutoff)
+          } else {
+          stop("No criterion is input to select genes, please select either pfp(fdr) or pval(P-value)")
+          }
+        }
+
+
       if (length(cutgenes.upin2)>0) {
               numTop=max(cutgenes.upin2)  
               gene.sel.upin2=RP.sort.upin2$ix[1:numTop]  
@@ -68,6 +80,7 @@ function(x,cutoff=NULL,num.gene=NULL,logged=TRUE,logbase=2,gene.names=NULL)
 
 
    pfp=round(pfp,4)
+   pval=round(pval,4)
    RP=round(RP,4)
    if (logged) {        
        FC=round(logbase^FC,4)
@@ -79,9 +92,9 @@ function(x,cutoff=NULL,num.gene=NULL,logged=TRUE,logbase=2,gene.names=NULL)
    
    if(length(gene.sel.upin2)>0) {
      Out.table.upin2=cbind(gene.sel.upin2,RP[gene.sel.upin2,1],FC[gene.sel.upin2],
-                   pfp[gene.sel.upin2,1])
+                   pfp[gene.sel.upin2,1],pval[gene.sel.upin2,1])
      rownames(Out.table.upin2)=rownames(pfp)[gene.sel.upin2]
-     colnames(Out.table.upin2)=c("gene.index","RP/Rsum","FC:(class1/class2)","pfp")  
+     colnames(Out.table.upin2)=c("gene.index","RP/Rsum","FC:(class1/class2)","pfp","P.value")  
 
      cat("Table1: Genes called significant under class1 < class2","\n\n")
     } else { 
@@ -94,9 +107,9 @@ function(x,cutoff=NULL,num.gene=NULL,logged=TRUE,logbase=2,gene.names=NULL)
    
    if(length(gene.sel.downin2)>0) {
      Out.table.downin2=cbind(gene.sel.downin2,RP[gene.sel.downin2,2],FC[gene.sel.downin2],
-                   pfp[gene.sel.downin2,2])
+                   pfp[gene.sel.downin2,2],pval[gene.sel.downin2,2])
      rownames(Out.table.downin2)=rownames(pfp)[gene.sel.downin2]
-     colnames(Out.table.downin2)=c("gene.index","RP/Rsum","FC:(class1/class2)","pfp")  
+     colnames(Out.table.downin2)=c("gene.index","RP/Rsum","FC:(class1/class2)","pfp","P.value")  
 
      cat("Table2: Genes called significant under class1 > class2","\n\n")  
     } else { 
