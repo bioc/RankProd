@@ -8,16 +8,21 @@
 
 \usage{
 
-     topGene(x,cutoff=NULL,num.gene=NULL,logged=TRUE,logbase=2,gene.names=NULL)}
+     topGene(x,cutoff=NULL,method="pfp",num.gene=NULL,logged=TRUE,logbase=2,gene.names=NULL)}
 
 \arguments{
 
      \item{x}{the value returned by the 
            function RP, RP.advance or
-
           Rsum.advance }
    
      \item{cutoff}{threshold in pfp used to select genes}
+  
+      \item{method} {If cutoff is provided, the method needs to be 
+              selected to identify genes."pfp" uses percentage of 
+              false prediction, which is the default setting.
+              "pval" used p-value which is less 
+              stringent than pfp}
 
      \item{num.gene}{number of candidate genes of interests, 
             if cutoff is provided, this will be ignored}
@@ -42,6 +47,7 @@
      RP/Rsum: Computed rank product/sum for each gene
      FC:(class1/class2): Expression Fold change of class 1/ class 2.                   
      pfp: estimated pfp for each gene if the gene is used as cutoff point
+     P.value: estimated p-value for each gene 
 
      Table 1 list genes that are up-regulated under class 2, Table 1 ist 
      genes that are down-regulated under class 2, 
@@ -89,10 +95,14 @@
       #get two lists of differentially expressed genes 
       #by setting FDR (false discivery rate) =0.05
 
-      table=topGene(RP.out,cutoff=0.05,logged=TRUE,logbase=2,
+      table=topGene(RP.out,cutoff=0.05,method="pfp",logged=TRUE,logbase=2,
                    gene.names=golub.gnames[,3])
       table$Table1
       table$Table2
+
+      #using pvalue<0.05
+      topGene(RP.out,cutoff=0.05,method="pval",logged=TRUE,logbase=2,
+                   gene.names=golub.gnames[,3])
 
       #by selecting top 10 genes
 
