@@ -61,7 +61,8 @@
      \item{pfp}{estimated percentage of false positive predictions
              (pfp) up to  the position of each gene under two 
               identificaiton each}
- 
+     \item{pval}{estimated pvalue for each gene being up- and down-regulated}  
+
      \item{RSs}{Origina rank-sum (average rank) of each genes} 
     
      \item{RSrank}{rank of the rank sum of each gene in ascending order}
