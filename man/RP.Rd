@@ -50,6 +50,8 @@
      \item{pfp}{estimated percentage of false positive predictions
              (pfp) up to  the position of each gene under two 
               identificaiton each} 
+     \item{pval}{estimated pvalue for each gene being up- and down-regulated} 
+                 
      \item{RPs}{Original rank-product of each genes for two 
                 dentificaiton each }
      \item{RPrank}{rank of the rank product of each genes}
@@ -66,7 +68,7 @@
      discovery rate (FDR), and it is possible to be large than 1.
   
      The function looks for up- and down- regulated genes in two
-     seperate steps, thus two pfps are computed and used to identify 
+     seperate steps, thus two pfps and pvalues are computed and used to identify 
      gene that belong to each group.   
 
      This function is suitable to deal with data from a 
