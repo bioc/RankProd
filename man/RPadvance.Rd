@@ -59,6 +59,8 @@
      \item{pfp}{estimated percentage of false positive predictions
              (pfp) up to  the position of each gene under two 
               identificaiton each}
+     \item{pval}{estimated pvalue for each gene being up- and down-regulated} 
+     
  
      \item{RPs}{Original rank-product of each genes for two i
                 dentificaiton each } 
