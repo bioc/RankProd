@@ -98,7 +98,7 @@
 }
 
 
-\reference{
+\references{
       Breitling, R., Armengaud, P., Amtmann, A., and Herzyk, 
       P.(2004) Rank Products: A simple, yet powerful, new method 
       to detect differentially regulated genes in
