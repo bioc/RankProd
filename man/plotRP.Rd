@@ -37,12 +37,6 @@
 }
 
 
-\reference{
-      Breitling, R., Armengaud, P., Amtmann, A., and Herzyk, 
-      P.(2004) Rank Products: A simple, yet powerful, new method 
-      to detect differentially regulated genes in
-      replicated microarray experiments, \emph{FEBS Letter}, 57383-92
-}
 
 
 \examples{
