@@ -162,7 +162,8 @@ arab.origin
 
 \section{Identification of differentially expressed genes -- Affymetrix array}
 \noindent In this section, we show how the rank product method can be applied to the sample data set \verb"arab".
-One should notice that rank products identify differentially expressed genes in two separate lists, up- and down-regulated genes separately. For each identification, one pfp (percentage of false prediction) is computed and used to select genes.
+One should notice that rank products identify differentially expressed genes in two separate lists, up- and down-regulated genes separately. 
+For each identification, one pfp (percentage of false prediction) is computed and used to select genes.
 
 \subsection{Data with single origin}
 First, we perform the analysis for data from a single origin. A subset data matrix is extracted by selecting columns whose origin label is 1.
@@ -210,8 +211,10 @@ plotRP(RP.out, cutoff=0.05)
 \end{center}
 
 \noindent The function \verb"topGene" is used to output a table of the identified genes based on user-specified
-selection criteria.  The required argument is the output value from function \verb"RP"  or \verb"RPadvance". The user also needs to specify either the \verb"cutoff" (the desired overall significance of the identification) or \verb"num.gene" (the number of top genes identified),
-otherwise a error message will be printed and the function will be stopped.
+selection criteria.  The required argument is the output object from function \verb"RP"  or \verb"RPadvance". The user also needs to specify either the \verb"cutoff" (the desired significance of the identification) or \verb"num.gene" (the number of top genes identified),
+otherwise a error message will be printed and the function will be stopped. If \verb"cutoff" is specified, the function also requests user to select either 
+\verb"pfp" (percentage of false prediciton) or \verb"pval" (pvalue) which is used to select genes. \verb"pfp" is the default setting, which is selected  when no selection is made by user.
+
 \begin{verbatim}
 > topGene(RP.out,gene.names=arab.gnames)
 Error in topGene(RP.out, gene.names = arab.gnames) : 
@@ -219,19 +222,25 @@ Error in topGene(RP.out, gene.names = arab.gnames) :
 
 \end{verbatim}
 <<>>=
-topGene(RP.out,cutoff=0.05,logged=TRUE,logbase=2,gene.names=arab.gnames)
+topGene(RP.out,cutoff=0.05,method="pfp",logged=TRUE,logbase=2,gene.names=arab.gnames)
 @
 
-\noindent Here the user chose to output the identified genes by controlling $pfp<0.05$;
-\verb"gene.names" are provided and thus are output with the table of selected genes. Since data set \verb"arab" is in log based 2 scale,
+\noindent Here the user chose to output the identified genes by controlling $pfp<0.05$. \verb"gene.names" are provided and thus are output with 
+the table of selected genes. Since data set \verb"arab" is in log based 2 scale,
 we specified \verb"logged=TRUE", \verb"logbase=2", which are the default values. 
 
-Two tables are output, listing identified up- (Table1: class 1 $<$ class 2) and down- (Table2: class 1 $>$ class 2) regulated genes.
-There are 4 columns in the table, the first one \verb"gene.index" is the gene index in the original data set; the second \verb"RP/Rsum" is the computed rank product (or rank sum in section ~\ref{sec::adv}) for each gene; the third column \verb"FC:(class1/class2)" 
-is the computed fold change of the average expression levels under two conditions, 
-which would be converted to the original scale using input \verb"logbase" (default value is 2) if \verb"logged=TRUE" is specified; the last column \verb"pfp" is the estimated pfp (FDR) value for the list up to each gene if
-that gene had served as the cutoff point. If the user is interested in the top, say, 50 genes, one can type
 
+Two tables are output, listing identified up- (Table1: class 1 $<$ class 2) and down- (Table2: class 1 $>$ class 2) regulated genes.
+There are 5 columns in the table, the first one \verb"gene.index" is the gene index in the original data set; the second \verb"RP/Rsum" is the computed rank product (or rank sum in section ~\ref{sec::adv}) for each gene; the third column \verb"FC:(class1/class2)" 
+is the computed fold change of the average expression levels under two conditions, 
+which would be converted to the original scale using input \verb"logbase" (default value is 2) if \verb"logged=TRUE" is specified; the 4th column \verb"pfp" is the estimated \verb"pfp"  value for each gene in the list if
+that gene serves as the cutoff point; the last column  \verb"P.value" is the associated P-values for each gene. If user want to use less stringent criterion (without adjust for multiple comparison), 
+$pvalue<0.05$ can be specified as
+\begin{verbatim}
+> topGene(RP.out,cutoff=0.05,method="pval",logged=TRUE,logbase=2,gene.names=arab.gnames)
+\end{verbatim}
+
+If the user is interested in the top, say, 50 genes, one can type
 \begin{verbatim}
 > topGene(RP.out,num.gene=50,gene.names=arab.gnames)
 \end{verbatim}
@@ -255,7 +264,7 @@ plotRP(RP.adv.out, cutoff=0.05)
 
 \begin{verbatim}
 ##Table of identified genes  by controlling pfp (FDR)=0.05,
-> topGene(RP.adv.out,cutoff=0.05,logged=TRUE,logbase=2,gene.names=arab.gnames)
+> topGene(RP.adv.out,cutoff=0.05,method="pfp",logged=TRUE,logbase=2,gene.names=arab.gnames)
 \end{verbatim}
 
 Note: By combining data sets from different origins together, the test gets increased power,
