@@ -74,6 +74,8 @@
                  that under class 2, if multiple origin, than avraged 
                  across all origin. log-fold change if data is in log scaled, 
                  original fold change if data is unlogged. }
+     \item{all.FC}{fold change of class 1/class 2 under each origin.
+                   log-fold change if data is in log scaled}
 }
 
 \note{Percentage of false prediction (pfp), in theory, is 
