@@ -4,6 +4,7 @@
 \alias{NewdataCom}
 \alias{Newdata}
 \alias{OriginxyCall}
+\alias{OriginxyCall2}
 \alias{RankComp}
 \alias{RankProd1}
 \alias{RankProd2}
