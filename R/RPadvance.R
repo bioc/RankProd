@@ -41,18 +41,18 @@ function(data,cl,origin,num.perm=100,logged=TRUE,na.rm=FALSE,gene.names=NULL,plo
       data1.all=data.pre$data1 ##data under condition1
       data2.all=data.pre$data2  ##data under condition2 
 
-      fold.change=matrix(0,num.gene,1)
+      fold.change=NULL
       for (l in 1:num.ori)
       { data1=as.matrix(data1.all[[l]])
         data2=as.matrix(data2.all[[l]])
  
         data1.ave=apply(data1,1,mean) 
         data2.ave=apply(data2,1,mean) 
-        if (logged) { fold.change=fold.change+(data1.ave-data2.ave)
-        }else {fold.change=fold.change+(data1.ave/data2.ave)}
+        if (logged) { fold.change=cbind(fold.change,(data1.ave-data2.ave))
+        }else {fold.change=cbind(fold.change,(data1.ave/data2.ave))}
         rm(data1,data2,data1.ave,data2.ave)
       }
-      ave.fold.change=fold.change/num.ori
+      ave.fold.change=apply(fold.change,1,mean)
           
    }
 
@@ -63,13 +63,13 @@ function(data,cl,origin,num.perm=100,logged=TRUE,na.rm=FALSE,gene.names=NULL,plo
        data1.all=data.pre$data1 ##data under condition1
        data2.all=data.pre$data2  ##data under condition2 
 
-       fold.change=matrix(0,num.gene,1)
+       fold.change=NULL
        for (l in 1:num.ori)
        { data1=as.matrix(data1.all[[l]])
-         fold.change=fold.change+apply(data1,1,mean) 
+         fold.change=cbind(fold.change,apply(data1,1,mean) )
          rm(data1)
        }
-       ave.fold.change=fold.change/num.ori
+       ave.fold.change=apply(fold.change,1,mean)
    }      
  
       
@@ -162,16 +162,19 @@ function(data,cl,origin,num.perm=100,logged=TRUE,na.rm=FALSE,gene.names=NULL,plo
    ave.fold.change=t(t(ave.fold.change))
    colnames(ave.fold.change)="log/unlog(class1/class2)"
 
+   colnames(fold.change)=paste("(class1/class2)-data",1:num.ori,sep="")
+
    if (!is.null(gene.names)) {
            rownames(pfp)=gene.names
            rownames(pval)=gene.names
            rownames(RPs)=gene.names
            rownames(RPrank)=gene.names
            rownames(ave.fold.change)=gene.names
+           rownames(fold.change)=gene.names
    } 
 
     
-   list(pfp=pfp,pval=pval,RPs=RPs,RPrank=RPrank,Orirank=Orirank,AveFC=ave.fold.change)
+   list(pfp=pfp,pval=pval,RPs=RPs,RPrank=RPrank,Orirank=Orirank,AveFC=ave.fold.change,all.FC=fold.change)
    
    ##output the estimated pfp and ranks of all genes
   
