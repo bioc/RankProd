@@ -6,17 +6,18 @@
      for each individual gene based on a user query}
 
 \usage{
-     plotGene(gene.to.plot,x,gene.names=NULL, data,cl,origin,
+     plotGene(gene.to.plot,x,gene.names=NULL, data, cl,origin,
               logged=TRUE,logbase=2)}
 
 \arguments{
-     \item{Gene.to.plot}{Name of the gene to be plotted}
+     \item{gene.to.plot}{Name of the gene to be plotted}
      \item{x}{the value returned by function RP, 
            RPadvance or RSadvance }
      
-     \item{gene.name}{Names of all genes in the data set. If "NULL", rownames 
+     \item{gene.names}{Names of all genes in the data set. If "NULL", rownames 
              of the data will be used}
-     \item{data.cl}{the same as that used in RP or RPadvance}
+     \item{data}{the same as that used in RP or RPadvance}
+     \item{cl}{the same as that used in RP or RPadvance}
 
     \item{origin}{a vector containing the origin labels of the 
               sample. e.g. for 
@@ -29,7 +30,6 @@
      \item{logbase}{base used when taking log, used to restore the 
                  fold change.The default value is 2, this will be 
                  ignored if logged=FALSE}
-
 
 }  
      
