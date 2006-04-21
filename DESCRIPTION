@@ -16,4 +16,5 @@ Description: Non-paramteric method for identifying differentially
         of the identification.
 License: free for non-commercial users. Non-academic users MUST have
         requested from the author
+biocViews: DifferentialExpression
 
