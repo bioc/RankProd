@@ -36,9 +36,6 @@
     \code{\link{RPadvance}} \code{\link{RSadvance}}
 }
 
-
-
-
 \examples{
      
       # Load the data of Golub et al. (1999). data(golub) 
@@ -61,5 +58,3 @@
       
 }
 \keyword{htest}
-
-

@@ -1,4 +1,3 @@
-
 \name{topGene}
 \alias{topGene}
 \title{Output Significant Genes}
@@ -71,8 +70,6 @@
       to detect differentially regulated genes in
       replicated microarray experiments, \emph{FEBS Letter}, 57383-92
 }
-}
-
 
 \examples{
 
@@ -109,8 +106,4 @@
       topGene(RP.out,num.gene=10,gene.names=golub.gnames[,3])
 
 }
-
-
-
 \keyword{htest}
-
