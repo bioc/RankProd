@@ -92,8 +92,8 @@ The data set is normalized by \verb"RMA", thus it is in \textit{log2} scale.
 \section{Required arguments}
 \noindent In order to run a rank product analysis, users need to call either the function \verb"RP" or \verb"RPadvance". \verb"RP" is a simpler version  which is specialized in handling data sets from a single origin, while \verb"RPadvance" is able to analyze data with single or multiple origins, and also perform some advanced analysis. There are two required arguments for the function \verb"RP": \verb"data" and \verb"cl", which are identical to those required by the function \verb"SAM" contained in the package \verb"siggenes".   The first required argument, \verb"data", is the matrix (or data frame) containing the gene expression data that should be analyzed. Each of its rows corresponds to a gene, and each column corresponds to a sample, which would be obtained, for example, by
 \begin{verbatim}
-> affybatch.example <- ReadAffy()
-> data<-exprs(rma(affybatch.example))
+> Dilution <- ReadAffy()
+> data<-exprs(rma(Dilution))
 \end{verbatim}
 The second required argument, \verb"cl", is the vector of length \verb"ncol(data)" containing the class labels of the samples. In a rank product analysis for data sets from different origin, there is one more required argument in the function \verb"RPadvance", \verb"origin", which is a vector of length \verb"ncol(data)" containing the origin labels of the samples.\\
 
