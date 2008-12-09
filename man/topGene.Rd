@@ -17,7 +17,7 @@
    
      \item{cutoff}{threshold in pfp used to select genes}
   
-      \item{method} {If cutoff is provided, the method needs to be 
+      \item{method}{If cutoff is provided, the method needs to be 
               selected to identify genes."pfp" uses percentage of 
               false prediction, which is the default setting.
               "pval" used p-value which is less 
