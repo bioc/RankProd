@@ -1,6 +1,5 @@
 Package: RankProd
-Version: 2.15.1
-Date: 2006-02-02
+Version: 2.15.2
 Title: Rank Product method for identifying differentially expressed
         genes with application in meta-analysis
 Author: Fangxin Hong <fahong@coh.org> and Ben Wittner
