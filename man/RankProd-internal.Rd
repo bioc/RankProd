@@ -15,6 +15,7 @@
 \details{These functions are not meant to be called 
           directly by the user.}
 \author{Fangxin Hong, \email{fhong@salk.edu}}
-\keyword{internal, RankProd-internal}
+\keyword{internal}
+%RankRrod-internal
 
 
