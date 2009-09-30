@@ -11,7 +11,7 @@
 
 \format{
 
-   \code{lymphoma} is an \code{\link[Biobase:exprSet-class]{exprSet}}
+   \code{lymphoma} is an \code{\link[Biobase:class.ExpressionSet]{exprSet}}
   containing the data from 8 chips
   from the lymphoma data set by Alizadeh et al. (see references). Each
   chip represents two samples: on color channel 1 (CH1, Cy3, green) the
