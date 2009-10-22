@@ -1,5 +1,5 @@
 Package: RankProd
-Version: 2.17.1
+Version: 2.17.2
 Date: 2009-03-25
 Title: Rank Product method for identifying differentially expressed
         genes with application in meta-analysis
@@ -14,7 +14,6 @@ Description: Non-paramteric method for identifying differentially
         estimated percentage of false predictions (pfp).The method can
         combine data sets from different origins (meta-analysis)to increase the power
         of the identification.
-License: free for non-commercial users. Non-academic users MUST have
-        requested from the author
+License: file LICENSE
 biocViews: DifferentialExpression
 
