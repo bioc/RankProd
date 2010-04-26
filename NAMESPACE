@@ -1,0 +1,5 @@
+importFrom(graphics, abline, barplot, mtext, par, plot, text, title)
+
+export(NaReplace, NaReplace2, Newdata, NewdataCom, OriginxyCall,
+       OriginxyCall2, plotGene, plotRP, RankComp, RankProd1,
+       RankProd2, RankSum, RP, RPadvance, RSadvance, topGene, xyCall)
