@@ -9,7 +9,7 @@
 \usage{
     RPadvance(data,cl,origin,num.perm=100,logged=TRUE,
               na.rm=FALSE,gene.names=NULL,plot=FALSE, 
-               rand=NULL)
+               rand=NULL, huge=FALSE)
 }
 
 \arguments{
@@ -49,6 +49,11 @@
 
       \item{rand}{if specified, the random number generator 
                will be put in a  reproducible state.}
+     \item{huge}{If "TRUE", use an alternative method for computation. This reduces
+	   memory complexity from quadratic to constant by only keeping one 
+	   column of the permutation matrix in memory. The downside is a slight
+	   increase in computing time. The result will not contain the Orirank 
+           value.}
 }
 
 \value{A result of identifying differentially expressed 
@@ -69,13 +74,14 @@
                  ascending order}
 
      \item{Orirank}{original ranks in each comparison, which 
-                     is used to compute rank product}
+                     is used to compute rank product. Not present if huge=TRUE is used.}
      \item{AveFC}{ fold change of average expression under class 1 over 
                  that under class 2, if multiple origin, than avraged 
                  across all origin. log-fold change if data is in log scaled, 
                  original fold change if data is unlogged. }
      \item{all.FC}{fold change of class 1/class 2 under each origin.
                    log-fold change if data is in log scaled}
+
            
 }
 
