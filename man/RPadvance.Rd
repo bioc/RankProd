@@ -49,11 +49,14 @@
 
       \item{rand}{if specified, the random number generator 
                will be put in a  reproducible state.}
-     \item{huge}{If "TRUE", use an alternative method for computation. This reduces
-	   memory complexity from quadratic to constant by only keeping one 
-	   column of the permutation matrix in memory. The downside is a slight
-	   increase in computing time. The result will not contain the Orirank 
-           value.}
+     \item{huge}{If "TRUE", use an alternative method for computation. Using 
+	   considerably less memory, this allows the Rank Product to be 
+	   calculated for larger input data (see details). However, the result
+	   will not contain the Orirank value.
+
+	   For input with n rows, m=m1+m2 columns for two classes, and k 
+	   permutations, memory requirements are 2n with huge=TRUE instead of
+	   n*k+n*m1*m2.}
 }
 
 \value{A result of identifying differentially expressed 
