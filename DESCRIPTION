@@ -11,10 +11,10 @@ Author: Fangxin Hong <fxhong@jimmy.harvard.edu> and Ben Wittner
 Maintainer: Fangxin Hong <fxhong@jimmy.harvard.edu>
 Depends: R (>= 1.9.0)
 Imports: graphics
-Description: Non-paramteric method for identifying differentially
-        expressed (up- or down- regulated )genes based on the
-        estimated percentage of false predictions (pfp).The method can
-        combine data sets from different origins (meta-analysis)to increase the power
+Description: Non-parametric method for identifying differentially
+        expressed (up- or down- regulated) genes based on the
+        estimated percentage of false predictions (pfp). The method can
+        combine data sets from different origins (meta-analysis) to increase the power
         of the identification.
 License: file LICENSE
 biocViews: DifferentialExpression
