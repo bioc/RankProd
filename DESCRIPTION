@@ -1,5 +1,5 @@
 Package: RankProd
-Version: 2.31.0
+Version: 2.31.1
 Date: 2011-12-13
 Title: Rank Product method for identifying differentially expressed
         genes with application in meta-analysis
@@ -17,5 +17,6 @@ Description: Non-parametric method for identifying differentially
         combine data sets from different origins (meta-analysis) to increase the power
         of the identification.
 License: file LICENSE
+License_restricts_use: yes
 biocViews: DifferentialExpression
 
