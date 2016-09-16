@@ -24,20 +24,27 @@
 
 \let\BLS=\baselinestretch
 \makeatletter
-\newcommand{\singlespacing}{\let\CS=\@currsize\renewcommand{\baselinestretch}{1}\small\CS}
+\newcommand{\singlespacing}{\let\CS=\@currsize\renewcommand{\baselinestretch}{1}
+\small\CS}
 \newcommand{\doublespacing}{\let\CS=\@currsize\renewcommand{
 \baselinestretch}{1.5}\small\CS}
-\newcommand{\normalspacing}{\let\CS=\@currsize\renewcommand{\baselinestretch}{\BLS}\small\CS}
+\newcommand{\normalspacing}{\let\CS=\@currsize\renewcommand{\baselinestretch}
+{\BLS}\small\CS}
 \makeatother
 
 %\pagestyle{myheadings}
 
 \title{ Bioconductor RankProd Package Vignette }
-\author{Fangxin Hong  fhong@salk.edu\\
-Ben Wittner  wittner.ben@mgh.harvard.edu}
+
+\author{Fangxin Hong, fhong@salk.edu
+\\ Francesco Del Carratore, francescodc87@gmail.com
+\\ Ben Wittner, wittner.ben@mgh.harvard.edu
+\\ Rainer Breitling, rainer.breitling@manchester.ac.uk
+\\ Andris Janckevics, andris.jankevics@gmail.com}
 
 
 \begin{document}
+\SweaveOpts{concordance=TRUE}
 %\markright{RankProd Vignette}
 \maketitle
 
@@ -51,75 +58,165 @@ Ben Wittner  wittner.ben@mgh.harvard.edu}
 \setcounter{page}{1}
 
 \section{Introduction}
-\noindent The RankProd package contains functions for the analysis of gene expression microarray data, in particular
-the identification of differentially expressed genes.  RankProd utilizes the so called rank product  non-parametric method (Breitling et al., 2004, \textit{FEBS Letters} \textbf{573}:83) to identify up-regulated or down-regulated genes under one condition against another condition, e.g. two different treatments, two different tissue types, etc.
+\noindent The RankProd package contains all the functions needed to apply the
+Rank Product (RP) and the Rank Sum (RS) methods
+(Breitling et al., 2004, \textit{FEBS Letters} \textbf{573}:83)
+to omics datasets.
 
-\noindent Rank Product is a non-parametric statistic that detects items that are consistently
-highly ranked in a number of lists, for example genes that are consistently found among the most
-strongly upregulated genes in a number of replicate experiments. It is based on the
-assumption that under the null hypothesis that the order of all items is random
-the probability of finding a specific item among
-the top $r$ of $n$ items in a list is $p=\frac{r}{n}$. Multiplying these probabilities leads to
-the definition of the rank product $RP=\prod_{i}\frac{r_i}{n_i}$, where $r_i$ is the rank
-of the item in the $i$-th list and $n_i$ is the total number of items in the $i$-th list.
-The smaller the $RP$ value, the smaller the probability that the observed placement
-of the item at the top of the lists is due to chance. The rank product is equivalent
-to calculating the geometric mean rank; replacing the \textit{product} by the \textit{sum}
-leads to a statistics (average rank) that is slightly more sensitive to outlier data
-and puts a higher premium on consistency between the ranks in various lists. This can
-be useful in some applications as detailed below.
+\noindent Both methods are a non-parametric statistical tests,
+derived from biological reasoning, able to detect variables (e.g. genes or
+metabolites) that are consistently upregulated (or downregulated) in a number
+of replicated experiments.
+In contrast to alternative approaches, both RP and RS are based on relatively
+weak assumptions:
+\begin{enumerate}
+\item{only a minority of all the features measured are upregulated
+(or downregulated);}
+\item{the measurements are independent between replicate experiments;}
+\item{most of the changes are independent with each other;}
+\item{measurement variance is about equal for all measurements.}
+\end{enumerate}
+While the first three are biologically reasonable assumptions, the latter
+cannot be considered always true, especially when dealing with metabolomics
+datasets.
+For this reason data preprocessing through the use of a variance stabilization
+method is often required.
 
 
-\noindent  A list of up- or down-regulated genes are selected based on the estimated percentage of false positive predictions (pfp), which is also known as false discovery rate (FDR).  The package is able to analyze both Affymetrix Genechip data as well as spotted cDNA array data after normalization.
-Another attraction of this method is its ability to combine data sets from different origins into one analysis to increase the power of the identification. In practice, this makes it possible for data sets generated at different laboratories or under different environments to be combined for study. Since the method utilizes the rank of genes in each array instead of the actual expression value, it can be flexibly applied to many different questions, such as identifying genes which are down-regulated under one condition while being up-regulated under another condition.\\
+\paragraph{Brief description of the RP method.}
+Suppose we have a differential expression data for a total of $N$ genes in $K$
+replicated experiments. Let $r_{i,j}$ be the position of the $i^{th}$ gene in
+the $j^{th}$ replicate experiment in a list ordered according to fold changes
+(in a decreasing order if we are interested in upreguleted genes,
+or in a increasing order vice versa). Under the null hypothesis
+(no differential expressed genes are present in the dataset), the rank of
+a gene in the list generated, considering a single replicate, comes from an
+uniform distribution (i.e. $P(r_{i} = x) = 1/N$, where $x \in \{1,..,N\}$).
+Considering all the $K$ replicates, one should notice that is extremely unlikely
+to find the same gene at the top of each list just by chance. In fact the exact
+probability of a gene being ranked 1 in each replicate is exactly $1/N^{K}$.
+The RP statistic for the $i^{th}$ is defined as the geometric mean of all the
+ranks of the gene obtained in each replicate:
+\begin{equation} \label{RP}
+RP_{i} = \Bigg{(}\prod_{j=1}^{K} {r_{i,j}}\Bigg{)}^{1/K}
+\end{equation}
+While the RS statistic is defined as the arithmetic mean of all the ranks:
+\begin{equation} \label{RS}
+RS_{i} = \frac{1}{K}\sum_{j=1}^{K} {r_{i,j}}
+\end{equation}
+Genes with the smallest $RP$ (or $RS$) values are the most likely to be
+upregulated or downregulated (according to the order we chose when ranking the
+fold changes).
+The RP is equivalent to calculating the geometric mean rank;
+replacing the \textit{product} by the \textit{sum}
+leads to a statistics (RS). This statistic is slightly less sensitive
+to outliers and puts a higher premium on consistency between the ranks in
+various lists. This can be useful in some applications as detailed below.
 
-\noindent This guide gives a tutorial-style introduction to the main features of RankProd and shows how these functions can be used. The presentation focuses on the analysis of Affymetrix array data, but the usage for cDNA array analysis will be illustrated briefly as well. \\
+
+\noindent The package is able to analyse different kinds of data, such as:
+Affymetrix Genechip data, spotted cDNA array data (after normalization) and
+metabolomics data (after variance stabilization).
+Both methods are also able to combine datasets derived from different origins
+into one analysis, increasing the power of the identification.
+Since the methods use the ranks of the variables in each replicated experiment
+(instead of the actual values), it can be flexibly applied to many different
+situations, such as identifying genes which are down-regulated under one
+condition while being up-regulated under another condition.\\
+
+\noindent This guide gives a tutorial-style introduction to the main features
+of RankProd and to the usage of its functions. The presentation
+focuses on the analysis of Affymetrix array data, cDNA array data
+and metabolomics data obtained from mass spectrometry. \\
+
 
 \noindent First, it is necessary to load the package.
 <<results=hide>>=
 library(RankProd)
 @
 
-\noindent In the following, we use the \textit{Arabidopsis} data set that is contained in this package to illustrate how rank product method analyses can be performed.
+\noindent In the following, we use the \textit{Arabidopsis} dataset that is
+contained in this package to illustrate how the RP and RS methods
+can be applied.
 <<>>=
 data(arab)
 @
 
-\verb"data(arab)" consists of a 500 $\times$ 10 matrix \verb"arab" containing the expression levels of 500 genes and 10 samples, a vector \verb"arab.cl" containing the class labels of the 10 samples, a vector \verb"arab.origin" containing the origin labels of the 10 samples (data were produced at two different laboratories), and a vector \verb"arab.gnames" containing the names(AffyID) of 500 genes.
-The data set is normalized by \verb"RMA", thus it is in \textit{log2} scale.
+\verb"data(arab)" consists of a 500 $\times$ 10 matrix \verb"arab" containing
+the expression levels of 500 genes in 10 samples, a vector \verb"arab.cl"
+containing the class labels of the 10 samples, a vector \verb"arab.origin"
+containing the origin labels of the 10 samples (data were produced at two
+different laboratories), and a vector \verb"arab.gnames"
+containing the names(AffyID) of the 500 genes.
+The dataset is normalized by \verb"RMA", thus it is in \textit{log2} scale.
 
 
 \section{Required arguments}
-\noindent In order to run a rank product analysis, users need to call either the function \verb"RP" or \verb"RPadvance". \verb"RP" is a simpler version  which is specialized in handling data sets from a single origin, while \verb"RPadvance" is able to analyze data with single or multiple origins, and also perform some advanced analysis. There are two required arguments for the function \verb"RP": \verb"data" and \verb"cl", which are identical to those required by the function \verb"SAM" contained in the package \verb"siggenes".   The first required argument, \verb"data", is the matrix (or data frame) containing the gene expression data that should be analyzed. Each of its rows corresponds to a gene, and each column corresponds to a sample, which would be obtained, for example, by
+\noindent In order to run a RP analysis, users need to call either
+the function \verb"RankProducts" or \verb"RP.advance" (is it also possible to
+use the two functions \verb"RP" and \verb"RPadvance" which have been kept in the
+package for backward compatibility). \verb"RankProducts" is a simpler version, 
+which is specialized in handling data sets from a single origin, while
+\verb"RP.advance" is able to analyse data with single or multiple origins,
+and also perform some advanced analysis. There are two required arguments for
+the function \verb"RanksProducts": \verb"data" and \verb"cl", which are
+identical to those required by the function \verb"SAM" contained in the package
+\verb"siggenes". The first required argument, \verb"data", is the matrix
+(or data frame) containing the gene expression data that should be analysed.
+Each of its rows corresponds to a gene, and each column corresponds to a sample,
+which would be obtained, for example, by
 \begin{verbatim}
 > Dilution <- ReadAffy()
 > data<-exprs(rma(Dilution))
 \end{verbatim}
-The second required argument, \verb"cl", is the vector of length \verb"ncol(data)" containing the class labels of the samples. In a rank product analysis for data sets from different origin, there is one more required argument in the function \verb"RPadvance", \verb"origin", which is a vector of length \verb"ncol(data)" containing the origin labels of the samples.\\
+The second required argument, \verb"cl", is a vector of length
+\verb"ncol(data)" containing the class labels of the samples. In a RP
+analysis for a datasets containing samples from different origins,
+there is one more required argument in the function \verb"RP.advance":
+\verb"origin", which is a vector of length \verb"ncol(data)" containing the
+origin labels of the samples.\\
 
-\noindent \textbf{One class data.} In the one class case, \verb"cl" is expected to be a vector of length \verb"n" containing only 1's, where \verb"n" denotes the number of samples. A label value other than 1 would also be accepted. In the latter case, this value is automatically set to 1. So for n=5, the vector \verb"cl" is given by
+\noindent \textbf{One class data.} In the one class case, \verb"cl" is expected
+to be a vector of length \verb"n" containing only 1's, where \verb"n" denotes
+the number of samples. A label value other than 1 would also be accepted.
+In the latter case, this value is automatically set to 1. So for n=5,
+the vector \verb"cl" is given by
 <<>>=
 n <- 5
 cl <- rep(1,5)
 cl
 @
-Note: for one class data, we usually refer it as the expression ratio of two channels. In the outputs from the package, we call the channel used as the numerator as class 1 and the channel used as denominator as class 2.
+Note: for one class data, we usually refer it as the expression ratio of two
+channels. In the outputs from the package, we call the channel used as the
+numerator as class 1 and the channel used as denominator as class 2.
 
 \vspace{0.3in}
-\noindent \textbf{Two class data.} In this class, the function expect a vector \verb"cl" consisting only of 0's and 1's, where all the samples with class label `0' belong to the first group (e.g., the control group), and the samples with class label `1' belong to the second group (e.g., the treatment group). For example, the first \verb"n1=5" columns belong to the first group, and the next \verb"n2=4" columns belong to the second group, the \verb"cl" is given by
+\noindent \textbf{Two class data.} In this case, the function expects a vector
+\verb"cl" consisting only of 0's and 1's, where all the samples with class
+label `0' belong to the first group (e.g. the control group) and the samples
+with class label `1' belong to the second group (e.g. the treatment group).
+For example, the first \verb"n1=5" columns belong to the first group, and the
+next \verb"n2=4" columns belong to the second group, the \verb"cl" is given by
 <<>>=
 n1 <- 5
 n2 <- 4
 cl <- rep(c(0,1),c(n1,n2))
 cl
 @
-Identically to the behavior of the \verb"SAM" analysis, the function also accepts others values than 0 and 1. In that case, the smaller value is set to 0 to be the first class and the larger value to 1 as the second class.\\
+Identically to the behaviour of the \verb"SAM" analysis, the function also
+accepts others values. In that case, the smaller value is set
+to 0 to be the first class and the larger value to 1 as the second class.\\
 
 \vspace{0.3in}
-\noindent \textbf{Single origin:}  If the data were generated under identical or very similar conditions
-except the factor of interest (e.g., control and treatment),
-it is considered to be data with a single origin. This is the most common case of array analysis done.
-In this case, the function \verb"RPadvance"  expects a vector \verb"origin" of length \verb"n" with only 1's.  For example, for 9 samples generated at one time in one laboratories, the first 5 columns in the data are class 1, and the next 4 are class 2, the \verb"cl" and \verb"origin" are given by
+\noindent \textbf{Single origin:}  If the data were generated under identical
+or very similar conditions except the factor of interest (e.g.
+control and treatment), it is considered to be data with a single origin.
+This is the most common case of array analysis.
+In this case, the function \verb"RP.advance" (and RPadvance) expects a vector
+\verb"origin" of length \verb"n" with only 1's.
+For example, for 9 samples generated at one time in one laboratories,
+the first 5 columns in the data are class 1, and the next 4 are class 2,
+the \verb"cl" and \verb"origin" are given by
 <<>>=
 n1 <- 5
 n2 <- 4
@@ -129,7 +226,8 @@ origin <- rep(1, n1+n2)
 origin
 @
 
-If 9 samples are from one class, the \verb"cl" and \verb"origin" are given by
+If 9 samples are from one class, the \verb"cl" and \verb"origin" vectors are
+given by:
 <<>>=
 n <- 9
 cl <- rep(1,n)
@@ -139,21 +237,29 @@ origin
 @
 
 \vspace{0.3in}
-\noindent \textbf{Multiple origins:} It sometimes happens that different laboratories conducted similar/same experiments to study the effect of the same treatment (e.g., application of a certain drug). Data sets generated at
-different laboratories are considered as data with different origins, as it is known that the resulting data are not directly comparable. Rank products can
-combine these data sets together to perform an overall analysis. In this case, the vector
-\verb"origin" should consist numbers 1 to L, where L is the number of different origins. For example, if there are 3 labs that did the
-same study, and used 6 samples, 4 samples and 8 samples, respectively, the \verb"origin" vector is given by
+\noindent \textbf{Multiple origins:} Sometimes happens that different
+laboratories conduct a very similar experiment to study the effect of the same
+treatment (e.g. application of a certain drug). Datasets generated by
+different laboratories are considered as data with different origin, as it is
+known that the resulting data are not directly comparable. The RP can
+combine these datasets together to perform an overall analysis. In this case,
+the vector \verb"origin" should consist numbers 1 to $L$, where $L$ is the
+number of different origins. For example, if 3 laboratories performed the
+same study using respectively 6, 4 and 8 samples,
+the \verb"origin" vector is given by
 <<>>=
 origin <- c(rep(1, 6), rep(2,4), rep(3,8))
 origin
 @
 
-The function also accepts others values in the origin labels. In that case, samples with the same origin
+The function also accepts other values in the origin labels. In that case,
+samples with the same origin
 label will be treated as having the same origin.\\
 
-\noindent Example: For the data set \verb"arab" which is included in the package, 6 samples are from lab 1,
-and another 4 are from lab 2. Both labs compare wild type \textit{Arabidopsis} plants with and without treatment (brassinosteroid).
+\noindent Example: For the dataset \verb"arab" which is included in the
+package, 6 samples are from laboratory 1,
+and another 4 are from laboratory 2. Both laboratories compare wild type
+\textit{Arabidopsis} plants with and without treatment (i.e. brassinosteroid).
 <<>>=
 colnames(arab)
 arab.cl
@@ -161,48 +267,71 @@ arab.origin
 @
 
 \section{Identification of differentially expressed genes -- Affymetrix array}
-\noindent In this section, we show how the rank product method can be applied to the sample data set \verb"arab".
-One should notice that rank products identify differentially expressed genes in two separate lists, up- and down-regulated genes separately. 
-For each identification, one pfp (percentage of false prediction) is computed and used to select genes.
+\noindent In this section, we show how the RP method can be applied
+to the dataset \verb"arab".
+One should notice that RP identifies differentially expressed genes in
+two separate lists, up- and down-regulated genes separately. 
+For each variable, a pfp (percentage of false prediction) is computed
+and used to select the differentially expressed variables.
+Alternatively, the p-values estimated by the function can be used with the
+same purpose after a multiple test correction is performed
+(e.g. Benjamini-Hochberg).
 
 \subsection{Data with single origin}
-First, we perform the analysis for data from a single origin. A subset data matrix is extracted by selecting columns whose origin label is 1.
+Here, we perform the analysis for the samples from the same origin.
+A subset data matrix is extracted by selecting columns whose origin label is 1.
 <<>>=
 arab.sub <- arab[,which(arab.origin==1)]
 arab.cl.sub <- arab.cl[which(arab.origin==1)]
 arab.origin.sub <- arab.origin[which(arab.origin==1)]
 @
-The rank product analysis for single-origin data can be performed by either \verb"RP" or \verb"RPadvance".  We first use function \verb"RP" to look for differentially expressed genes between class 2 (class lable=1)and class 1 (class lable=0). 
+The RP analysis for single-origin data can be performed by either
+\verb"RankProducts" or \verb"RP.advance"(and also by the two functions kept for
+backward compatibility \verb"RP" and \verb"RPadvance"). Initially, we use the
+function \verb"RankProducts" to look for differentially expressed genes between
+class 2 (class label=1)and class 1 (class label=0). 
 <<>>=
-RP.out <- RP(arab.sub,arab.cl.sub, num.perm=100, logged=TRUE,
+RP.out <- RankProducts(arab.sub,arab.cl.sub, logged=TRUE,
 na.rm=FALSE,plot=FALSE,  rand=123)
 @
-In this case, the data in \verb"arab" are already log-transformed, otherwise one should set \verb"logged=FALSE". The default number of permutations is 100, this can be set to higher values by the user to obtain more precise estimates of the pfp.
-The argument \verb"plot=FALSE" will prevent the graphical display of the estimated pfp \textit{vs.} number of identified genes.
-The argument \verb"rand" sets the random number seed to \verb"123" to make the results of \verb"RP" reproducible. Since we chose some default values in function \verb"RP" , we would simply type
+Data in \verb"arab" are already log-transformed, otherwise one
+should set \verb"logged=FALSE". The argument \verb"plot=FALSE" will prevent the
+graphical display of the estimated pfp \textit{vs.} number of identified genes.
+The argument \verb"rand" sets the random seed number to \verb"123" allowing the
+function to produce reproducible results.
+Since some of the function parameters have a default value, we can use this
+function by simply typing:
 \begin{verbatim}
-> RP.out <- RP(arab.sub,arab.cl.sub,gene.names=arab.gnames,rand=123)
+> RP.out <- RankProducts(arab.sub,arab.cl.sub,gene.names=arab.gnames,rand=123)
 \end{verbatim}
-The same analysis could also be done by
+The same results could also be obtained by
 \begin{verbatim}
-> RP.out <- RPadvance(arab.sub, arab.cl.sub, arab.origin.sub, num.perm = 100,
+> RP.out <- RP.advance(arab.sub, arab.cl.sub, arab.origin.sub,
 +     logged = TRUE, na.rm = FALSE, gene.names = arab.gnames, plot = FALSE,
 +     rand = 123)
- The data is from  1 different origins
-
-Rank Product analysis for two-class case
-
-Starting  100 permutations...
-Computing pfp...
 \end{verbatim}
 or
 \begin{verbatim}
-> RP.out=RPadvance(arab.sub,arab.cl.sub,arab.origin.sub,gene.names=arab.gnames,rand=123)
+> RP.out=RP.advance(arab.sub,arab.cl.sub,arab.origin.sub,gene.names=arab.gnames,rand=123)
+\end{verbatim}
+or
+\begin{verbatim}
+> RP.out <- RP(arab.sub,arab.cl.sub,gene.names=arab.gnames,rand=123)
+\end{verbatim}
+or
+\begin{verbatim}
+> RP.out=RPadvance(arab.sub,arab.cl.sub,arab.origin.sub,gene.names=arab.gnames,
++                  rand=123)
 \end{verbatim}
 
-\noindent The function \verb"plotRP" can be used to plot a graphical display of the estimated pfp \textit{vs.} number of identified genes using the output from \verb"RP" or \verb"RPadvance"
-If \verb"cutoff" (the maximum accepted pfp) is specified, identified genes are
-marked in red (see figure 1). Note that the estimated pfp is not necessarily smaller than 1, but will converge to 1 in the tail. Two plots will be generated on current graphic display, for identification of up- and down-regulated genes under class 2, respectively.\\
+\noindent The function \verb"plotRP" can be used to plot a graphical display of
+the estimated pfp \textit{vs.} number of identified genes using the output from
+\verb"RankProducts" or \verb"RP.advance" (also for \verb"RP"
+and \verb"RPadvance"). If \verb"cutoff" (the maximum accepted pfp) is specified,
+identified genes are marked in red (see figure 1). Note that the estimated pfps
+are not necessarily smaller than 1, but they will converge to 1.
+Two plots will be generated on current graphic display, for identification
+of up- and down-regulated genes under class 2, respectively.\\
 
 \begin{center}
 <<fig=TRUE,echo=TRUE>>=
@@ -210,50 +339,74 @@ plotRP(RP.out, cutoff=0.05)
 @
 \end{center}
 
-\noindent The function \verb"topGene" is used to output a table of the identified genes based on user-specified
-selection criteria.  The required argument is the output object from function \verb"RP"  or \verb"RPadvance". The user also needs to specify either the \verb"cutoff" (the desired significance of the identification) or \verb"num.gene" (the number of top genes identified),
-otherwise a error message will be printed and the function will be stopped. If \verb"cutoff" is specified, the function also requests user to select either 
-\verb"pfp" (percentage of false prediciton) or \verb"pval" (pvalue) which is used to select genes. \verb"pfp" is the default setting, which is selected  when no selection is made by user.
+\noindent The function \verb"topGene" generates a table of the
+identified genes based on user-specified selection criteria. One of the required
+argument is the output object from \verb"RankProducts" or \verb"RP.advance"
+(also for \verb"RP" and \verb"RPadvance"). The user also needs to specify
+either the \verb"cutoff" (the pfp or p value threshold) or
+\verb"num.gene" (the number of top genes identified),
+otherwise a error message will be printed and the function will stop.
+If \verb"cutoff" is specified, the function also requests user to select either 
+\verb"pfp" (percentage of false prediction) or \verb"pval" (p value) which
+is used to select genes. \verb"pfp" is the default setting.
 
 \begin{verbatim}
 > topGene(RP.out,gene.names=arab.gnames)
 Error in topGene(RP.out, gene.names = arab.gnames) : 
-        No selection criteria is input, please input either cutoff or num.gene
-
+No selection criteria is input, please input either cutoff or num.gene
 \end{verbatim}
 <<>>=
-topGene(RP.out,cutoff=0.05,method="pfp",logged=TRUE,logbase=2,gene.names=arab.gnames)
+topGene(RP.out,cutoff=0.05,method="pfp",
+logged=TRUE,logbase=2,gene.names=arab.gnames)
 @
 
-\noindent Here the user chose to output the identified genes by controlling $pfp<0.05$. \verb"gene.names" are provided and thus are output with 
-the table of selected genes. Since data set \verb"arab" is in log based 2 scale,
-we specified \verb"logged=TRUE", \verb"logbase=2", which are the default values. 
+\noindent Here the user can choose variables shown by controlling
+$pfp<0.05$. If \verb"gene.names" is provided the output will also show the names
+of the selected genes. Since data set \verb"arab" is in log based 2 scale,
+we specified \verb"logged=TRUE" and \verb"logbase=2", which are the default
+values. 
 
-
-Two tables are output, listing identified up- (Table1: class 1 $<$ class 2) and down- (Table2: class 1 $>$ class 2) regulated genes.
-There are 5 columns in the table, the first one \verb"gene.index" is the gene index in the original data set; the second \verb"RP/Rsum" is the computed rank product (or rank sum in section ~\ref{sec::adv}) for each gene; the third column \verb"FC:(class1/class2)" 
-is the computed fold change of the average expression levels under two conditions, 
-which would be converted to the original scale using input \verb"logbase" (default value is 2) if \verb"logged=TRUE" is specified; the 4th column \verb"pfp" is the estimated \verb"pfp"  value for each gene in the list if
-that gene serves as the cutoff point; the last column  \verb"P.value" is the associated P-values for each gene. If user want to use less stringent criterion (without adjust for multiple comparison), 
-$pvalue<0.05$ can be specified as
+The output consists of two tables, listing selected up- (Table1: class 1 $<$ class 2)
+and down- (Table2: class 1 $>$ class 2) regulated genes.
+In the tables, there are 5 columns, the first one \verb"gene.index" contains
+the gene indexes; the second \verb"RP/Rsum" contains the computed Rank
+Product (or RS) statistics;
+the third \verb"FC:(class1/class2)" contains the computed fold change of the
+average expression levels under two conditions, which would be converted to the
+original scale using input \verb"logbase" (default value is 2) if
+\verb"logged=TRUE" is specified;
+the fourth \verb"pfp" contains the estimated \verb"pfp" value for each gene
+in the list; the last \verb"P.value" contained the estimated
+P-values for each gene. If the user wants to use a less stringent criterion,
+a cutoff on the p-value ($pvalue<0.05$) can be specified as:
 \begin{verbatim}
-> topGene(RP.out,cutoff=0.05,method="pval",logged=TRUE,logbase=2,gene.names=arab.gnames)
+> topGene(RP.out,cutoff=0.05,method="pval",logged=TRUE,logbase=2,
++         gene.names=arab.gnames)
 \end{verbatim}
 
-If the user is interested in the top, say, 50 genes, one can type
+If the user is interested in the top 50 genes, he/she can type
 \begin{verbatim}
 > topGene(RP.out,num.gene=50,gene.names=arab.gnames)
 \end{verbatim}
 
 \subsection{Data with multiple origins} \label{secaffy:multi}
-\noindent In this section, we will illustrate how the rank product analysis can be applied to data sets from multiple origins using the built-in data set \verb"arab". As introduced above, \verb"arab" consists of array data sets measured at two different laboratories. Both labs measured gene expression under two classes with similar condition.\\
-\noindent The lack of experimental standards for microarray experiments leads to heterogeneous
-data sets for which direct comparison is not possible. Instead of using actual expression data, the present approach combines the gene
-rank from different origins together to select genes (for details refer to Breitling et al. (2004)). 
+\noindent In this section, we will illustrate how the RP method
+can be applied to datasets containing samples from multiple origins using
+the built-in data set \verb"arab". As mentioned before, \verb"arab" consists of
+array data measured by two different laboratories.
+Both laboratories measured gene expression under the same two conditions.\\
+\noindent Given the lack of experimental standards for microarray experiments, 
+direct comparison is not feasible. Instead of using actual
+expression data, our approach combines the gene
+rank from different origins together
+(for details refer to Breitling et al. (2004)). 
 <<>>=
 ##identify differentially expressed  genes
-RP.adv.out <-  RPadvance(arab,arab.cl,arab.origin,num.perm=100,
+RP.adv.out <-  RP.advance(arab,arab.cl,arab.origin,
 logged=TRUE,gene.names=arab.gnames,rand=123)
+#The last command can also be written using the old syntax
+#RP.adv.out <-  RPadvance(arab,arab.cl,arab.origin,
+#logged=TRUE,gene.names=arab.gnames,rand=123)
 @
 
 \begin{center}
@@ -262,24 +415,33 @@ plotRP(RP.adv.out, cutoff=0.05)
 @
 \end{center}
 
-\begin{verbatim}
-##Table of identified genes  by controlling pfp (FDR)=0.05,
-> topGene(RP.adv.out,cutoff=0.05,method="pfp",logged=TRUE,logbase=2,gene.names=arab.gnames)
-\end{verbatim}
+By combining data from different origins, the power of the statistical test
+increases leading to an higher number of selected genes, as shown in the
+following table.
 
-Note: By combining data sets from different origins together, the test gets increased power,
-which leads to more identified genes.
-
+\begin{center}
+<<>>=
+topGene(RP.adv.out,cutoff=0.05,method="pfp",logged=TRUE,logbase=2,
+        gene.names=arab.gnames)
+@
+\end{center}
 
 \section{Identification of differentially expressed genes -- cDNA array}
-\noindent For cDNA array data, the usage of the rank product method is
-different from that for Affymetrix arrays, since gene expressions of two conditions are measured from one spot. The usage is different depending on the experimental design.
-Two types of design are regularly encountered: Common reference designs in which two type RNA samples are compared via a common reference, or direct two-color designs in which two types of RNA samples are directly compared without a common reference.
+\noindent When dealing with cDNA array data, the usage of the RP
+method has to change since gene expressions of two conditions
+are measured from a single spot. Furthermore, the RP implementation
+will also change according to the experimental design.
+The two most commonly encountered experimental design are:
+\begin{itemize}
+\item{\textbf{common reference design}, where two RNA samples are compared via
+a common reference;}
+\item{\textbf{direct two-color design}, where two RNA samples are directly
+compared without a common reference.}
+\end{itemize}
 
 \subsection{Common Reference Design}
-In this case, different RNA samples are compared with a common reference for each array.
-This type of analysis is very similar to the analysis of Affymetrix Genechips.
-As an example, we will
+This type of analysis is very similar to the analysis of
+Affymetrix Genechips. As an example, we will
 have a look at the data \verb"lymphoma" copied from the package \verb"vsn". 
 <<>>=
 data(lymphoma)
@@ -305,14 +467,22 @@ data(lymphoma)
 16 lc7b058 DLCL-0023
 \end{verbatim}
 
-The 16 columns of the \verb"lymphoma" object contain the red and green intensities, respectively, from the 8 slides, as shown in the table. Thus, the Ch1 intensities are in column 1,3,\ldots,15, the Ch2 intensities in column 2,4,\ldots,16.  We can call \verb"vsn" to normalize all of them at once.
+As shown in the table, the 16 columns of the \verb"lymphoma" object contain the red
+and green intensities of the 8 slides.
+Thus, the Ch1 intensities are in columns 1,3,\ldots,15, while the Ch2
+intensities are in columns 2,4,\ldots,16. We can call \verb"vsn" to normalize
+all of them at once.
+
 \begin{verbatim}
 > library(vsn)
 > lym.vsn <- vsn(lymphoma)
 > lym.exp <- exprs(lym.vsn)
 \end{verbatim}
 
-We can then obtain the log-ratios for each slide, by subtracting the common reference intensities from those for the 8 samples. A class label vector is created for these 8 samples, and function \verb"RP" is called to perform a two-class analysis.
+Next, we can obtain the log-ratios for each slide by subtracting the common
+reference intensities from the 8 samples. After a class label vector is
+created, the \verb"RankProducts" function can be called to
+perform a two-classes analysis.
 <<>>=
 refrs <- (1:8)*2-1
 samps <- (1:8)*2
@@ -320,15 +490,23 @@ M <- lym.exp[,samps]-lym.exp[,refrs]
 colnames(M)
 cl <- c(rep(0,4),rep(1,4))
 cl  #"CLL" is class 1, and "DLCL" is class 2
-RP.out <- RP(M,cl, logged=TRUE, rand=123)
+RP.out <- RankProducts(M,cl, logged=TRUE, rand=123)
+#The last command can also be written using the old syntax
+# RP.out <- RP(M,cl,logged=TRUE,rand=123)
 @
+
 <<results=hide>>=
 topGene(RP.out,cutoff=0.05,logged=TRUE,logbase=exp(1))
 @
 Note that \verb"vsn" normalized data is in log base \textit{e}.
 
+
 \subsection{Direct two-color design}
-\noindent In order to use the rank product method, the gene expression ratio for the two dyes (classes) is calculated for each spot, ratio=expression of class 1/expression of class 2. Suppose there is an experiment in which two wild type (class 1) and two mutant mice (class 2) are compared using two arrays. The targets might be
+\noindent In this case, the gene expression ratio of the two dyes (classes) is
+measured for each spot.
+Here we consider and experiment where two wild type (class1) and two mutant mice
+(class2) are compared.
+The targets might be:
 \begin{center}
 \begin{tabular}{lccc} \hline
 File name & Cy3 &Cy5 & Ratio=wt/mu \\\hline
@@ -338,48 +516,179 @@ File 3  & wt &  mu & Cy3/Cy5 \\
 File 4  & mu &  wt & Cy5/Cy3 \\\hline
 \end{tabular}
 \end{center}
-The first required argument, \verb"data", is the matrix (or data frame) containing the gene expression ratio that one intends to analyze. Each of its rows corresponds to a gene, and each column corresponds to the ratio of one chip. Since the input \verb"data" is already log-ratios, the second required argument, \verb"cl", should be set to the vector of length \verb"ncol(data)" with all 1's, and a one-class rank product analysis performed to identify up- or down-regulated genes .
+The first required argument for the the \verb"RankProducts", \verb"data",
+is the matrix (or data frame) containing the gene expression ratios.
+The rows correspond to the genes, while each column corresponds to the
+ratio of one chip. Since the input \verb"data" is already log-ratios,
+the second required argument, \verb"cl", has to be a the vector of
+length \verb"ncol(data)" containing only 1's.
+Finally, a one-class RP analysis can be performed in order to identify
+up- or down-regulated genes.
 \begin{verbatim}
 > cl=rep(1,4)
-> RP(data,cl, logged=TRUE, rand=123)
+> RankProducts(data,cl, logged=TRUE, rand=123)
+># or using the old syntax
+># RP(data,cl, logged=TRUE, rand=123)
 \end{verbatim}
-One should notice, for the direct two-color design rank products will not distinguish the details of different designs in the way \verb"limma" does (for example see the special designs discussed in section 9 of the \verb"limma" vignette including simple comparison and dye swaps). And the problems caused by the difference of biological replicates or technical replicate are not an issue
-in the rank products analysis, either.
+
+It should be noticed that for the direct two-color design,
+the RP will not distinguish the details of different designs
+as done by \verb"limma" (for example see the special designs discussed in
+section 9 of the \verb"limma" vignette including simple comparison and
+dye swaps). Furthermore, the differences among biological or technical
+replicates are not an issue in the RP analysis.
+
+
+\section{Identification of differentially expressed metabolites -
+LC/MS based metabolomics experiment}
+
+As mentioned before, our methods (especially the RS) can be successfully used to
+analyse metabolomics datasets. Testing biomarker selection methods on real data
+is problematic. In fact, we usually do not know the "True" biomarkers a priori.
+In order to cope with this problem, a publicly available UPLC-MS spike-in
+metabolomics dataset has been used (Franceschi P., et al. (2012)). This dataset
+has been obtained from twenty apples, ten of which have been spiked with known
+compounds that naturally occur in apples. The raw have been pre-processed
+allowing us to work with a data matrix containing the basepeaks intensities of
+the identified metabolites. The dataset used in this example is contained this
+package, but it can also be found in the \verb"BioMark" package
+(Wehrens R., et al. (2011)). The dataset can be loaded as follows:
+<<>>=
+data(Apples)
+@
+The list of the features associated to the spiked-in biomarkers is contained in
+the \verb"Biom" vector:
+
+<<>>=
+Biom
+@
+While the \verb"apples.cl" vector, contains the class labels of the samples.
+As mentioned before, it is necessary to apply variance stabilization and
+normalization to the data. This can be easily done with the \verb"vsn"
+funciton.
+
+\begin{verbatim}
+> library(vsn)
+> apples.data.exp<-vsn(apples.data)
+> apples.data.vsn<-exprs(apples.data.exp)
+\end{verbatim}
+
+In order to put an higher premium on consistency between replicates, the RS
+analysis is preferred here. 
+
+<<>>=
+RS.apples<-RankProducts(apples.data.vsn, apples.cl,
+                        gene.names = rownames(apples.data.vsn), 
+                        calculateProduct = FALSE, rand=123)
+@
+
+As shown in previous examples, the \verb"topGene" function can be used in order
+to show the variables presenting a \verb"pfp" values smaller or equal than
+$0.05$.
+It is also possible to store the indexes of the selected variables in a vector
+called \verb"selected".
+<<>>=
+topGene(RS.apples,cutoff = 0.05, method = "pfp",
+        gene.names = rownames(apples.data.vsn))
+selected <- which(RS.apples$pfp[,1]<= 0.05)
+@
+
+Comparing the variables selected by out method with the list of the real
+biomarkers, it is easy to see that the method is able to identify 4 true
+biomarkers out of 5, while finding only one False positive.
+<<>>=
+selected %in% Biom
+@
+
+
 
 \section{Advanced usage of the package}\label{sec::adv}
-Since the rank product method uses ranks instead of actual expression to identify genes,
-the method can be generally used in many other cases beside the simple two-class comparison. As what mentioned in the introduction, the rank product is equivalent
-to calculating the geometric mean rank which is robust to the outliers. However, replacing the \textit{product} by the \textit{sum} leads to a statistics (average rank) that is slightly more sensitive to individual data value
-and puts a higher premium on consistency between the ranks in various lists (Breitling et
-al., submitted). There is a function \verb"RSadvance" in the \verb"RankProd" library which can be used to perform a rank sum analysis. Since the rank sum method hasn't been published yet, we would only recommend it to the advanced users, and we will not guarantee the performance. The following examples show the potential usage.
+Since the RP method uses ranks instead of actual expression to
+identify genes, the method can be generally used in many other cases beside
+the simple two-class comparison.
+Evaluating the RP is equivalent to calculating the geometric mean
+of Rank. Replacing the \textit{product} with the
+\textit{sum} (i.e. replacing the geometric mean with the average) leads to the
+RS. Which is a statistic that is slightly less sensitive to outliers and
+puts a higher premium on consistency between the ranks in various lists.
+The RS analysis can be performed both by the \verb"RankProducts" and
+\verb"RP.advance" functions (the latter can also cope with the multiple origins
+case). In fact, setting \verb"calculateProduct=FALSE" the functions will perform
+the RS instead of the RP.
+In order to guarantee the backward compatibility with the previous version of
+the package, the function \verb"RSadvance" has been kept allowing to perform
+the RS analysis with the old syntax.
 
-\subsection{Identify genes with consistent down- or up-regulation upon drug-treatment}
-\noindent This example was inspired  by a question posted in the BioC mailing-list.
-There are 3 studies and  4 to 5 doses of a drug  within each study (the doses are not the same in each study). Genes that are consistently up- or down- regulated by drug compared to control are of interests. Rank sum method can be potentially used towards this end by treating 3 studies as 3 origins in a multi-origin study introduced in section ~\ref{secaffy:multi}.\\
+\subsection{Identify genes with consistent down- or up-regulation upon
+drug-treatment}
+\noindent The following example has been inspired by a question posted in the
+BioC mailing-list.
+Suppose that a comparative study (control against treated) has been performed
+3 different times with a different dosage of the same drug.
+The aim of such study is to investigate genes that are consistently up- or
+down- regulated by the drug when compared to controls.
+\noindent Regardless the difference in the drug dosage,
+one will expect that the genes up-regulated (down-regulated) by the drug
+will consistently show an high (low) rank in all studies.
+Treating the 3 studies as 3 different origins (as shown in
+section ~\ref{secaffy:multi}), the RS method can be successfully
+performed.
+The identified genes will be good candidates for consistent down- or
+up-regulation under various conditions.
 
-\noindent Although the drug doses are different in each study, people do expect genes with high rank in ascending order (treatment \textit{vs.} control) across different studies to be consistently down-regulated,  genes with high rank in descending order (treatment \textit{vs.} control) to be
-consistently up-regulated. Since we would expect candidate genes having relative consistent high rank in all studies, we prefer to use \verb"RSadvance" to perform a three-origin analysis treating each study as one origin. The identified genes would be good candidates for consistent down- or up-regulation under various conditions
 
-\subsection{Simultaneously identify genes up-regulated under one condition and down-regulated under another condition}
-\noindent Normally, when people conduct a microarray study that studies responses in two different (and opposing)
-conditions, two lists of genes will be identified independently: up-regulated genes under condition 1, down-regulated genes under condition 2.  Genes appearing in both lists will be called as the candidate genes. However, the rank-based method can be used to identify the desired list of genes in a single analysis. In other words, one significance is controlled for the identification. This is another advantage of the rank-based method compared to other methods.\\
 
-\noindent To perform this analysis, one can  rank
- genes in ascending order under one condition and descending order under another condition, then put all ranks together as in a 2-origin study to identify the desired candidate genes.  Since we would expect consistent ranks for the candidate genes under both conditions, we would prefer \verb"RSadvance" instead of rank product. The practical application is a bit complicated,  the data \verb"arab"  is again used to illustrate the usage. Suppose we want to check the consistence of the data sets generated in two different labs. For example, we would look for genes that were measured to be up-regulated in class 2 at lab 1, but down-regulated in class 2 at lab 2. In stead of changing the function to rank genes in different order under two conditions, we switched class labels for lab 2. Thus the resulted "class 2" is the real class 2 in lab 1 and the real class 1 in lab 2, and the resulted "class 1" is the real class 1 in lab1 and the real class  in lab2. We call the resulted classes as hypothetical class 1 or 2.
+
+
+\subsection{Simultaneously identify genes up-regulated under one condition
+and down-regulated under another condition}
+\noindent  
+
+Usually, in a microarray study that considers the responses
+in two different conditions, two lists of genes are identified independently:
+\begin{itemize}
+\item{up-regulated genes under condition 1;}
+\item{down-regulated genes under condition 2.}
+\end{itemize}
+Genes appearing in both lists are considered as the candidates.
+The rank-based method can be used to identify the desired list of genes in a
+single analysis. This is another advantage of the rank-based methods.\\
+\noindent In fact, one can rank genes in ascending order under the first
+condition and in descending order under the second one.
+The two lists, can be considered together as in a 2-origin study in order to
+identify the candidate genes.
+Using the data \verb"arab", we now show a practical example.
+Suppose that we want to verify the consistency of the datasets generated in two
+different laboratories. Specifically, we want to look for genes that have been detected
+as up-regulated in class 2 at laboratory 1, but down-regulated in class 2 at
+laboratory 2.
+This can be achieved switching class labels for laboratory 2.
+Thus, for laboratory 2 the hypothetical class1 represents the real class2.
 <<>>=
 arab.cl2 <- arab.cl
 arab.cl2[arab.cl==0 &arab.origin==2] <- 1
 arab.cl2[arab.cl==1 &arab.origin==2] <- 0
 arab.cl2
 @
-\noindent Looking for genes that are consistently up-regulated under hypothetical class 2 is equivalent as looking for genes that are up-regulated under class 2 in lab 1 and down-regulated under class 2 in lab2.  Ideally, we would expect genes having very different ranks from two labs after switching class labels in lab 2, therefore a rank sum analysis is preferred to  emphasis on consistency on the candidate genes. As illustration purpose, we used only first 500 genes to perform a fast analysis
+\noindent If the measurements in the two laboratories are consistent, the genes 
+will have very different ranks in the two origins.
+The RS analysis is preferred here, in order to emphasise consistency
+for the candidate genes. In the following example, we used only the first 500
+genes to perform a fast analysis.
 <<>>=
-Rsum.adv.out <- RSadvance(arab,arab.cl2,arab.origin,num.perm=100,
+Rsum.adv.out <- RP.advance(arab,arab.cl2,arab.origin,calculateProduct=FALSE,
 logged=TRUE,gene.names=arab.gnames,rand=123)
+# also the old syntax can be used
+#Rsum.adv.out <- RSadvance(arab,arab.cl2,arab.origin,
+#logged=TRUE,gene.names=arab.gnames,rand=123)
 topGene(Rsum.adv.out,cutoff=0.05,gene.names=arab.gnames)
 @
 
-\noindent No gene was found to be differentially expressed at level of FDR=0.05, indicating a relative good consistency of the experiments conducted at two labs. Further study the  top 10 genes in the lists indicates that those genes are indeed similar
+\noindent No gene was found to be differentially expressed (FDR=0.05),
+indicating a relative good consistency of the experiments conducted by the two
+laboratories.
+Looking at the top 10 genes in the lists, it easy to realise that they are
+indeed very similar.
 <<>>=
 topGene(Rsum.adv.out,num.gene=10,gene.names=arab.gnames)
 @
@@ -389,37 +698,143 @@ plotRP(Rsum.adv.out,cutoff=0.05)
 @
 \end{center}
 
-\noindent The plot of the estimated pfp \textit{vs.} number of identified genes is shown in figure 2.  The abnormal patterns in the plot compared with that in figure 1 also indicate a meaningless identification.
-However, due to the stability of the rank product statistics against outliers,  genes would be identified using rank product method
+
+\noindent The abnormal patterns shown in figure 3 (compared with figure 1)
+reveal a meaningless identification. However, due to its
+stability, the RP statistics is still able to identify some genes.
 <<>>=
-RP.adv.out <- RPadvance(arab,arab.cl2,arab.origin,num.perm=100,
+RP.adv.out <- RP.advance(arab,arab.cl2,arab.origin,calculateProduct=TRUE,
 logged=TRUE,gene.names=arab.gnames,rand=123)
+#  also the old syntax can be used
+#RP.adv.out <- RPadvance(arab,arab.cl2,arab.origin,
+#logged=TRUE,gene.names=arab.gnames,rand=123)
 @
 
 <<>>=
 topGene(RP.adv.out,cutoff=0.05,gene.names=arab.gnames)
 @
-\noindent However, the log fold-change indicating non-significant finding, which is also confirmed by the further study of the the ranks under 13 comparisons  for one gene(first 9 in lab 1, next 4 in from lab 2).
- \begin{verbatim}
- > RP.adv.out$Orirank[[1]][344,]
- [1]   3   4   3   1   1   1   1   1   1 495 496 453 492
-\end{verbatim}
+\noindent Nevertheless, the log fold-changes show that these findings are
+not significant.
+This is also confirmed by the comparison of the ranks under 13
+pairings for one gene (first 9 in laboratory 1, next 4 in from laboratory 2).
+<<>>=
+RP.adv.out$Orirank[[1]][344,]
+@
+
+\section{Changes introduced in the last version}
+In this section changes introduced in the new version of the package are briefly
+summarized.
+
+\subsection{Application to unpaired datasets}
+Let T and C stand for two experimental conditions (e.g. treatment versus
+control),
+while $n_{T}$ and $n_{C}$ are the number of replicates in the two conditions.
+In the old package the RP (RS) analysis for the unpaired case
+was performed according the ad hoc procedure decribed here:
+\begin{enumerate}
+\item all the possible $K = n_{T} \times n_{C}$ pair-wise comparisons are
+considered and $K$ lists of ratios FC are evaluated;
+\item the ratios are ranked within each comparison ($r_{gi}$ is the rank of the
+$g$th gene in the $i$th comparison);
+\item the RP for each gene is determined as
+$RP_{g}=(\prod_{i}{r_{gi}})^{1/K}$;
+\item alternatively, the RS is determined as
+$RP_{g}=({\sum_{i}{r_{gi}}})/K$.
+\end{enumerate}
+
+Apparently, such approach leads to an increase of the False Discovery Rate. 
+\noindent In the new package, a new and more principled method has been
+developed. This method is described below:
+
+\begin{enumerate}
+\item the number of pairs ($npairs$) is defined as the number of the samples
+in the smallest class;
+\item if not defined by the user, the number of Random Pairings that will
+be generated ($n_{rp}$) is set to $npairs \times npairs$
+(if this number is not odd $n_{rp}=npairs \times npairs + 1$);
+\item Sampling from the original dataset, $n_{rp}$ new datasets of dimension
+$(ngenes \times npairs)$ are generated;
+\item the RP (RS) is evaluated $n_{rp}$ times considering each
+Random Pairing as a paired experiment; 
+\item per each gene, the final $RP_{g}$ (or $RS_{g}$) is estimated as the median
+of the $n_{rp}$ values evaluated in the step before.
+\end{enumerate}
+
+\subsection{Evaluation of the p-values for the RP}
+Instead of the permutation approach used in the old version of the package,
+the pvalues for the RP are now evaluated through the fast algorithm
+described in \textit{Heskes et al. 2014}, which allows a very accurate
+approximation of the p-values in a computationally fast manner. This approach
+significantly speeds up the RP analysis. When considering a typical paired
+dataset ($N = 1000$ and $K = 10$), the computation time is now reduced by a
+factor of $\sim 500$, when compared with the analysis performed with the
+previous approach (using $10,000$ permutations).
+
+\subsection{Evaluation of the p-values for the RS}
+Also in this case, the permutation approach was abbandoned. We have developed
+a novel method able to compute the exact p-values for the RS in a fast manner.
+This method is straightforward and based on a very simple analogy.
+It is easy to understand that, under the null hypothesis,
+the probability distribution of the RS, in an experiment with $N$ features and
+$K$ replicates, is exactly the same as the probability distribution of the sum
+of the outcomes obtained by rolling $K$ dice with $N$ faces
+(\url{http://mathworld.wolfram.com/Dice.html}).
+The numerical error generated by our fast algorithm increases with the the size
+of the dataset.
+For this reason we developed a more
+accurate implementation of the same algoritm, which is able to cope with
+extremely large datasets. Unfortunately, this leads to an increase of the
+computational time. When the size of the dataset is such that the use of the
+accurate implementation is needed and the time needed to
+evaluate the exact p-values becomes unacceptable, the new package computes the
+exact p-values for the smallest RS values for \verb"tail.time" minutes.
+The rest of the p-values are approximated with the following gaussian:
+\begin{equation} \label{RP}
+\mathcal{N} (\mu =  \dfrac{K(N+1)}{2} ,\sigma^{2} = \dfrac{K(N^{2}-1)}{12})
+\end{equation}
+It should be noticed that with such large datasets, this approximation is
+extremely accurate. Nevertheless, in this case the fuction shows the
+highest p-values exactly computed, so the user can play with the tail.time
+parameter if not satisfied. In most of the cases, this approach significantly
+speeds up the RS analysis. When considering a typical paired
+dataset ($N = 1000$ and $K = 10$), the computation time is now reduced by a
+factor of $\sim 1200$, when compared with the analysis performed with the
+previous approach (using $10,000$ permutations).
 
 
- The approach discussed in this section is still in the early stages of development, is not published yet.
-Hence, it should only be used with caution and with further detailed examination.
+
+
+
+
+
+
 
 \section*{Reference}
 
 \begin{list}{}{\itemindent=-1.0cm}
- \item Breitling, R., Armengaud, P., Amtmann, A., and Herzyk, P.(2004) Rank Products:
-      A simple, yet powerful, new method to detect differentially regulated genes in
-      replicated microarray experiments, {\it FEBS Letter}, 57383-92
 
- \item Nemhauser JL, Mockler TC, Chory J. (2004)  Interdependency of brassinosteroid
-       and auxin signaling in Arabidopsis. {\it PLoS Biol.}  21460
+\item Breitling, R., Armengaud, P., Amtmann, A., and Herzyk, P.(2004)
+Rank Products:
+A simple, yet powerful, new method to detect differentially regulated genes in
+replicated microarray experiments. {\it FEBS Letter}, 57383-92
+
+\item Nemhauser JL, Mockler TC, Chory J. (2004)  Interdependency of
+brassinosteroid and auxin signaling in Arabidopsis. {\it PLoS Biol.}  21460
 
 \item  http://arabidopsis.org/info/expression/ATGenExpress.jsp
+
+\item Heskes, T.,Eisinga, R., and Breitling, R.(2014) 
+A fast algorithm for
+determining bounds and accurate approximate p-values of the rank product
+statistic for replicate experiments. {\it BMC bioinformatics}, 15.1: 367.
+
+\item Franceschi, P., Masuero, D., Vrhovsek, U., Mattivi, F. and Wehrens R.
+(2012) A benchmark spike-in data set for biomarker identification in
+metabolomics. {\it Journal of chemometrics}, 26(1-2):16-24.
+
+\item Wehrens, R., Franceschi, P., Vrhovsek, U. and Mattivi, F.
+Stability-based biomarker selection. {\it Analytica chimica acta}, 705(1):15-23.
+
 \end{list}
 
 

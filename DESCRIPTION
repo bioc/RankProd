@@ -1,22 +1,26 @@
 Package: RankProd
-Version: 2.45.0
-Date: 2011-12-13
-Title: Rank Product method for identifying differentially expressed
-        genes with application in meta-analysis
-Author: Fangxin Hong <fxhong@jimmy.harvard.edu> and Ben Wittner
-        <Wittner.Ben@mgh.harvard.edu> with contribution from Rainer
-        Breitling <r.breitling@bio.gla.ac.uk>, Colin Smith
-        <colin@colinsmith.org>, and Florian Battke 
-	<battke@informatik.uni-tuebingen.de>
-Maintainer: Fangxin Hong <fxhong@jimmy.harvard.edu>
-Depends: R (>= 1.9.0)
+Version: 2.45.1
+Date: 2016-09-16
+Title: Rank Product method for identifying differentially expressed genes with
+        application in meta-analysis
+Author: Francesco Del Carratore
+        <francesco.delcarratore@postgrad.manchester.ac.uk>,
+        Andris Janckevics <andris.jankevics@gmail.com>
+        Fangxin Hong <fxhong@jimmy.harvard.edu>,
+        Ben Wittner <Wittner.Ben@mgh.harvard.edu>,
+        Rainer Breitling <r.breitling@bio.gla.ac.uk>,
+        and Florian Battke <battke@informatik.uni-tuebingen.de>
+Maintainer: Francesco Del Carratore
+            <francescodc87@gmail.com>
+Depends: R (>= 3.2.1), stats, methods, Rmpfr, gmp
 Imports: graphics
 Description: Non-parametric method for identifying differentially
         expressed (up- or down- regulated) genes based on the
         estimated percentage of false predictions (pfp). The method can
-        combine data sets from different origins (meta-analysis) to increase the power
-        of the identification.
+        combine data sets from different origins (meta-analysis)
+        to increase the power of the identification.
 License: file LICENSE
 License_restricts_use: yes
-biocViews: DifferentialExpression
-
+biocViews: DifferentialExpression, StatisticalMethod, Software, ResearchField, Metabolomics,
+            Lipidomics, Proteomics, SystemsBiology, GeneExpression,
+            Microarray, GeneSignaling

@@ -1,5 +1,26 @@
 importFrom(graphics, abline, barplot, mtext, par, plot, text, title)
+importFrom(gmp, chooseZ, pow.bigz)
+importFrom(Rmpfr, mpfr)
+export(topGene)
+export(RP)
+export(RPadvance)
+export(RSadvance)
+export(RankProducts)
+export(plotRP)
+export(RP.advance)
+import(stats)
+import(methods)
 
-export(NaReplace, NaReplace2, Newdata, NewdataCom, OriginxyCall,
-       OriginxyCall2, plotGene, plotRP, RankComp, RankProd1,
-       RankProd2, RankSum, RP, RPadvance, RSadvance, topGene, xyCall)
+
+
+
+#export(computeOrirank)
+#export(dice.sum.cdf)
+#export(dice.sum.pdf)
+#export(genenames)
+#export(mzmatch.R.wrongvalues)
+#export(NAreplace)
+#export(OriginxyCall)
+#export(plotPFP)
+#export(rankprodbounds)
+#export(xyCall)

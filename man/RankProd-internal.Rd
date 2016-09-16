@@ -1,26 +1,23 @@
 \name{RandProd-internal}
-\alias{NaReplace}
-\alias{NaReplace2}
-\alias{NewdataCom}
-\alias{Newdata}
+\alias{computeOrirank}
+\alias{dice.sum.cdf}
+\alias{dice.sum.pdf}
+\alias{genenames}
+\alias{mzmatch.R.wrongvalues}
+\alias{NAreplace}
 \alias{OriginxyCall}
-\alias{OriginxyCall2}
-\alias{RankComp}
-\alias{RankProd1}
-\alias{RankProd2}
-\alias{RPV1}
-\alias{RPV2}
-\alias{RPadvanceV2}
-\alias{RPadvanceV1}
-\alias{RankProd1v2}
-\alias{RankSum}
+\alias{plotPFP}
+\alias{rankprodbounds}
 \alias{xyCall}
 \title{Internal RankProd functions}
 \description{Internal RankProd functions.}
 \details{These functions are not meant to be called 
-          directly by the user.}
-\author{Fangxin Hong, \email{fhong@salk.edu}}
+directly by the user.}
+\author{Fangxin Hong, \email{fhong@salk.edu}
+\\ Rainer Breitling, \email{rainer.breitling@manchester.ac.uk}
+\\ Francesco Del
+Carratore, \email{francesco.delcarratore@postgrad.manchester.ac.uk}
+\\ Andris Janckevics, \email{andris.jankevics@gmail.com}
+}
 \keyword{internal}
-%RankRrod-internal
-
 
