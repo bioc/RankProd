@@ -10,6 +10,11 @@
         data=matrix(data,nrow=1)  ##force into matrix format
     }
 if(is.data.frame(data)){data <- as.matrix(data)}
+check.cl <- sort(unique(cl), decreasing = F)
+if (all(check.cl!= c(0,1))){
+    cat("\n the class label has to contain only 0 or 1")
+    stop()
+}
 # number of pairs equal to the number of the smaples in the smallest class
     npairs <- min(length(which(cl==0)),length(which(cl==1)))
     if (npairs==0){
@@ -103,7 +108,7 @@ for (ori in 1:num.ori){
     }
     npairs.ori <- min(length(which(cl.ori==0)),length(which(cl.ori==1)))
     if(npairs.ori==0) {nrep.ori <- length(cl.ori)} else {nrep.ori <- npairs.ori}
-    if (is.na(MinNumOfValidPairs)) MinNumOfValidPairs <- nrep.ori/2
+    if (is.na(MinNumOfValidPairs)) MinNumOfValidPairs <- floor(nrep.ori/2)
     xy.out.ori <- xyCall(cl.ori, RandomPairs, !calculateProduct)
     cl.ori <- xy.out.ori$cl
     x.ori <- xy.out.ori$x
@@ -250,7 +255,7 @@ for (randpair in 1:RandomPairs){
 ## replace values in badrows with NA, after "order" function rank to those rows
 ## will be set to NA, and ignored in sum or prod calculation
     if (length(badrows.ori)!=0){
-        inputmatrix[badrows.ori,] <- NA
+        inputmatrix.ori[badrows.ori,] <- NA
       }
 output.ori <- matrix(ncol=ncol(inputmatrix.ori),nrow=nrow(inputmatrix.ori))
 inputmatrix.Class2.ori <- inputmatrix.ori*(-1)
