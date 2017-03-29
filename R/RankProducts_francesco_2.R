@@ -27,7 +27,7 @@ if ((RandomPairs %% 2) == 0) RandomPairs <- RandomPairs + 1
 # MinNumOfValidPairs is a parameter that indicates the minimum number of NAs
 #accepted per each variable/feature/gene
 # If it is set to NA the half of the number of replicates is used
-if (is.na(MinNumOfValidPairs)) MinNumOfValidPairs <- nrep/2
+if (is.na(MinNumOfValidPairs)) MinNumOfValidPairs <- floor(nrep/2)
 #This two variables are used to save the ranks of each iteration,
 #if the parameter huge is set to true these variables 
 #are not saved in order to save memory
