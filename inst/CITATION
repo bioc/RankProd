@@ -10,5 +10,16 @@ citEntry(entry="article",
    textVersion = paste("Del Carratore, F., Jankevics, A., Eisinga, R., Heskes, T., Hong, F. & Breitling, R. (2017).",
 		       "RankProd 2.0: a refactored Bioconductor package for detecting differentially expressed features in molecular profiling datasets.","Bioinformatics."))
 
+citEntry(entry="article",
+   author="Hong, F. and Breitling, R. and McEntee, W.C. and Wittner, B.S. and Nemhauser, J.L. and Chory, J.",
+   title="RankProd: a bioconductor package for detecting differentially expressed genes in meta-analysis",
+   journal="Bioinformatics",
+   year="2006",
+   volume="22",
+   pages="2825-2827",
+   textVersion = paste("Hong, F., Breitling, R., McEntee, W.C., Wittner, B.S., Nemhauser, J.L., Chory, J. (2006).",
+		       "RankProd: a bioconductor package for detecting differentially expressed genes in meta-analysis","Bioinformatics. 22(22):2825-2827"))
+
+
 citFooter(paste("See manpages and related packages",
 	         "for respective citations."))
