@@ -1,14 +1,14 @@
 Package: RankProd
-Version: 3.3.3
+Version: 3.3.4
 Date: 2016-09-16
 Title: Rank Product method for identifying differentially expressed genes with
         application in meta-analysis
 Author: Francesco Del Carratore
         <francesco.delcarratore@postgrad.manchester.ac.uk>,
-        Andris Janckevics <andris.jankevics@gmail.com>
+        Andris Jankevics <andris.jankevics@gmail.com>
         Fangxin Hong <fxhong@jimmy.harvard.edu>,
         Ben Wittner <Wittner.Ben@mgh.harvard.edu>,
-        Rainer Breitling <r.breitling@bio.gla.ac.uk>,
+        Rainer Breitling <rainer.breitling@manchester.ac.uk>,
         and Florian Battke <battke@informatik.uni-tuebingen.de>
 Maintainer: Francesco Del Carratore
             <francescodc87@gmail.com>
