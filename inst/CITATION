@@ -1,13 +1,14 @@
 citHeader("To cite the RankProd package in publications use:")
 
 citEntry(entry="article",
-   author="Del Carratore, F. and Jankevics, A. and Eisinga, R. and Heskes, T. and Hong, F. and Breitling, R.",
+   author="{Del Carratore}, F. and Jankevics, A. and Eisinga, R. and Heskes, T. and Hong, F. and Breitling, R.",
    title="RankProd 2.0: a refactored Bioconductor package for detecting differentially expressed features in molecular profiling datasets",
    journal="Bioinformatics",
    year="2017",
-   volume="N/A",
-   pages="N/A",
-   textVersion = paste("Del Carratore, F., Jankevics, A., Eisinga, R., Heskes, T., Hong, F. & Breitling, R. (2017).",
+   volume="33",
+   issue="17",
+   pages="2774-2775",
+   textVersion = paste("{Del Carratore}, F., Jankevics, A., Eisinga, R., Heskes, T., Hong, F. & Breitling, R. (2017).",
 		       "RankProd 2.0: a refactored Bioconductor package for detecting differentially expressed features in molecular profiling datasets.","Bioinformatics."))
 
 citEntry(entry="article",
