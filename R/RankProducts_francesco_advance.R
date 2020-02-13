@@ -87,9 +87,9 @@ if ( is.null(yy)){ ##one-sample
 #This two variables are used to save the ranks of each iteration,
 #if the parameter huge is set to true these variables 
 #are not saved in order to save memory
+ranks1<- vector("list",RandomPairs)
+ranks2<- vector("list",RandomPairs)
 if(!huge){
-    ranks1<- vector("list",RandomPairs)
-    ranks2<- vector("list",RandomPairs)
     Orirank<-vector("list",2)
     Orirank.ori<-vector("list",2)#
     } 
