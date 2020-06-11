@@ -1,4 +1,4 @@
-"RP.advance" <- function(data,cl,origin, logged=TRUE,na.rm=TRUE,gene.names=NULL,
+"RP.advance_fixed" <- function(data,cl,origin, logged=TRUE,na.rm=TRUE,gene.names=NULL,
                         plot=FALSE, rand = NULL,
                         calculateProduct=TRUE, MinNumOfValidPairs=NA,
                         RandomPairs=NA, huge=FALSE, fast=TRUE, tail.time=0.05){
@@ -98,7 +98,9 @@ prod_out <- list ()
 prod_out.Class2 <- list()
 output<-vector("list", RandomPairs)
 output.Class2<-vector("list", RandomPairs)
+MinNumOfValidPairsBUP <- MinNumOfValidPairs
 for (ori in 1:num.ori){
+  MinNumOfValidPairs <- MinNumOfValidPairsBUP
     data.ori <-cbind(data.pre$data1[[ori]],data.pre$data2[[ori]])
     if(!is.null(data.pre$data2)){
         cl.ori <-c(rep(0,dim(data.pre$data1[[ori]])[2]),
