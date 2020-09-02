@@ -1,4 +1,4 @@
-"RP.advance_fixed" <- function(data,cl,origin, logged=TRUE,na.rm=TRUE,gene.names=NULL,
+"RP.advance" <- function(data,cl,origin, logged=TRUE,na.rm=TRUE,gene.names=NULL,
                         plot=FALSE, rand = NULL,
                         calculateProduct=TRUE, MinNumOfValidPairs=NA,
                         RandomPairs=NA, huge=FALSE, fast=TRUE, tail.time=0.05){
